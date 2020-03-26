@@ -5,7 +5,7 @@ def sqrt_decomposition():
     while True:
         n = input('Введите размерность массива (P.S. Для выхода из программы введите слово "exit"): ')
         if n == "exit":  # Type "exit" to exit from the programme
-            exit()
+            break
         while n.isalpha() or int(n) < 0:  # Validation of input data
             n = input("Введите размерность массива: ")
         n = int(n)
@@ -17,13 +17,12 @@ def sqrt_decomposition():
 
         l, r = input("Введите левую, а затем правую границу суммы: ").split()
         if l == "exit" or r == "exit":
-            exit()
+            break
         while l.isalpha() or r.isalpha() or int(l) < 0 or int(r) < 0 or int(l) > int(r) or int(l) >= int(n) or \
                 int(r) >= int(n):
-            l = int(l)
-            r = int(r)
+            l, r = input("Введите левую, а затем правую границу суммы: ").split()
         l, r = int(l), int(r)
-        length = int(math.sqrt(n)) + 1
+        length = int(math.sqrt(n)) + 1  # Length of one subsection
         sum = [0] * length  # array for sum of subsections
         n_l, n_r = l // length, r // length  # block with lower and upper bound
         result = 0  # Final sum
@@ -56,8 +55,8 @@ def sqrt_decomposition():
         print("Сумма элементов с ", l, "по", r, "равна: ", result)
 
 
-def sqrt_from_file():
-    with open("Считываемые данные.txt") as file:
+def sqrt_from_file(file_name = "Считываемые данные.txt"):
+    with open(file_name) as file:
         info = file.read()
         info = info.replace("\n", " ")
         info = info.split()
@@ -97,4 +96,5 @@ def sqrt_from_file():
         print("Нужная вам сумма: ", result)
 
 
-sqrt_decomposition()
+if __name__ == "__main__":
+    sqrt_from_file()
