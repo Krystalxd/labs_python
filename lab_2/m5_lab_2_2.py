@@ -22,7 +22,7 @@ def filespam():
             file = name + ".txt"
 
             word_tuple_str, line_tuple_str = input("Введите кол-во букв в слове и кол-во слов в строке (введите 0,0 для"
-                                                   " значения по умолчанию) через знак '/': ").split("/")
+                                                   " значения по умолчанию) через знак ',': ").split(",")
             if word_tuple_str == "exit" or line_tuple_str == "exit":
                 break
             if word_tuple_str == "0,0":
@@ -38,8 +38,8 @@ def filespam():
                     int(word_tuple_str.split(",")[0]) > int(word_tuple_str.split(",")[1]) or \
                     int(line_tuple_str.split(",")[0]) > int(line_tuple_str.split(",")[1]):  # Validation of input data
                 word_tuple_str, line_tuple_str = input("Введите кол-во букв в слове и кол-во слов в строке "
-                                                       "(введите 0,0 для значения по умолчанию) через знак '/': ")\
-                    .split("/")
+                                                       "(введите 0,0 для значения по умолчанию) через знак ',': ")\
+                    .split(",")
             word_tuple, line_tuple = tuple(map(int, word_tuple_str.split(","))), \
                                      tuple(map(int, line_tuple_str.split(",")))
 
