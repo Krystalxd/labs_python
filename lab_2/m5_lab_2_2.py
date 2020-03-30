@@ -2,13 +2,6 @@ from random import randint
 from string import ascii_letters
 import argparse
 
-parser = argparse.ArgumentParser(description="Spamming file")  # Creating of parser to use with command line
-parser.add_argument("-mb", "--mb", type=int, required=True, help="Size of the file")
-parser.add_argument("-file", "--file", type=str, required=True, help="Name of the file")
-parser.add_argument("-word_tuple_str", "--word_tuple_str", type=str, default="3,10", help="Amount of word symbols")
-parser.add_argument("-line_tuple_str", "--line_tuple_str", type=str, default="10,100", help="Size of the file")
-args = parser.parse_args()
-
 
 def filespam():
     try:
@@ -79,40 +72,47 @@ def filespam():
         filespam()
 
 
-def file_spam_by_args(mb, file, word_tuple_str, line_tuple_str):  # Using with command line
-    word_tuple, line_tuple = tuple(map(int, word_tuple_str.split(","))), \
-                             tuple(map(int, line_tuple_str.split(",")))
+def file_spam_by_args():  # Using with command line
+    parser = argparse.ArgumentParser(description="Spamming file")  # Creating of parser to use with command line
+    parser.add_argument("-mb", "--mb", type=int, required=True, help="Size of the file")
+    parser.add_argument("-file", "--file", type=str, required=True, help="Name of the file")
+    parser.add_argument("-word_tuple_str", "--word_tuple_str", type=str, default="3,10", help="Amount of word symbols")
+    parser.add_argument("-line_tuple_str", "--line_tuple_str", type=str, default="10,100", help="Size of the file")
+    args = parser.parse_args()
+    word_tuple, line_tuple = tuple(map(int, args.word_tuple_str.split(","))), \
+                             tuple(map(int, args.line_tuple_str.split(",")))
     result = ''
     size = 0
     alphabet = list(ascii_letters)
+    file = args.file + ".txt"
     with open(file, "w") as f:
-        while size < mb * (1024 ** 2):
+        while size < args.mb * (1024 ** 2):
             word_amount = randint(int(line_tuple[0]), int(line_tuple[1]))
             for i in range(word_amount):
                 word = ''
                 symbols_amount = randint(int(word_tuple[0]), int(word_tuple[1]))
                 for x in range(symbols_amount):
                     letter = alphabet[randint(0, 51)]
-                    if size < mb * (1024 ** 2):
+                    if size < args.mb * (1024 ** 2):
                         size += 1
                         result += letter
                         word += letter
                     else:
                         break
-                if size < mb * (1024 ** 2):
+                if size < args.mb * (1024 ** 2):
                     size += 1
                     result += ' '
                 else:
                     break
-            if size < mb * (1024 ** 2):
+            if size < args.mb * (1024 ** 2):
                 size += 2
                 result += '\n'
             else:
                 break
-            print("\r", "Прогресс программы: ", round((size * 100) / (mb * 1048576), 1), "%", end="")
+            print("\r", "Прогресс программы: ", round((size * 100) / (args.mb * 1048576), 1), "%", end="")
         f.write(result)
     print("\n")
 
 
 if __name__ == "__main__":
-    file_spam_by_args(args.mb, args.file, args.word_tuple_str, args.line_tuple_str)
+    file_spam_by_args()
