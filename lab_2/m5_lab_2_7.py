@@ -4,7 +4,7 @@ import argparse
 def leonardo():
     try:
         while True:
-            n = input("Введите номер нужного числа Леонардо: ")
+            n = input('Введите номер нужного числа Леонардо (для выхода из программы введите "exit"): ')
             if n == "exit":
                 break
             while n.isalpha() or int(n) < 0:
