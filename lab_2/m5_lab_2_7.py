@@ -32,7 +32,6 @@ def leonardo_by_command_line():
         print(1)
     else:
         print(result)
-    return
 
 
 if __name__ == "__main__":
