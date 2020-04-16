@@ -1,0 +1,10 @@
+{
+  "check": 142, 
+  "check2": [125, "waiting for a good mark ], 
+  "check3": null, 
+  "check4": {
+  "a": 666
+}, 
+  "check5": True, 
+  "check6": "hahaxd"
+}
