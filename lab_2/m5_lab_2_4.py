@@ -4,6 +4,8 @@ import argparse
 def flatten_it(iterable_object=[1, 2, 3, ["haha", [3], 7], (9)]):
     try:
         for x in iterable_object:
+            if x == iterable_object:
+                raise ValueError
             if hasattr(x, '__iter__') and not isinstance(x, str):  # If your element is one number
                 # or a string object, then we leave it
                 yield from flatten_it(x)  # Recursion for list objects
