@@ -34,9 +34,7 @@ def filespam():
             word_tuple, line_tuple = tuple(map(int, word_tuple_str.split(","))), \
                                      tuple(map(int, line_tuple_str.split(",")))
 
-            result = ''
-            size = 0
-            alphabet = list(ascii_letters)
+            result, size, alphabet = '', 0, list(ascii_letters)
 
             with open(file, "w") as f:
                 while size < mb * (1024 ** 2):
