@@ -1,6 +1,31 @@
 import argparse
 
 
+def multiplication_of_matrices(first_matrix, second_matrix):  # function for matrix multiplication
+    first_element = first_matrix[0][0] * second_matrix[0][0] + first_matrix[0][1] * second_matrix[1][0]
+    second_element = first_matrix[0][0] * second_matrix[0][1] + first_matrix[0][1] * second_matrix[1][1]
+    third_element = first_matrix[1][0] * second_matrix[0][0] + first_matrix[1][1] * second_matrix[1][0]
+    fourth_element = first_matrix[1][0] * second_matrix[0][1] + first_matrix[1][1] * second_matrix[1][1]
+    first_matrix[0][0] = first_element
+    first_matrix[0][1] = second_element
+    first_matrix[1][0] = third_element
+    first_matrix[1][1] = fourth_element
+
+
+def power(first_matrix, n):  # function for exponentiation
+    matrix = [[1, 1], [1, 0]]
+    for i in range(2, n + 1):
+        multiplication_of_matrices(first_matrix, matrix)
+
+
+def fib(n):  # function for finding fibonacci numbers
+    matrix = [[1, 1], [1, 0]]
+    if n == 0:
+        return 0
+    power(matrix, n - 1)
+    return matrix[0][0]
+
+
 def leonardo():
     try:
         while True:
@@ -11,12 +36,10 @@ def leonardo():
                 n = input("Введите номер нужного числа Леонардо: ")
             n = int(n)
 
-            psi = (1 + 5 ** 0.5) / 2
-            result = int((2 / (5 ** 0.5)) * (psi ** (n + 1) - (1 - psi) ** (n + 1)) - 1)
             if n == 0 or n == 1:
                 print(1)
             else:
-                print("Ваше число: ", result)
+                print("Ваше число: ", 2 * fib(n + 1) - 1)
     except ValueError:
         leonardo()
 
@@ -26,12 +49,13 @@ def leonardo_by_command_line():
     # to use with command line
     parser.add_argument("-number", "--number", type=int, required=True, help="Number of Leonardo number")
     args = parser.parse_args()
-    psi = (1 + 5 ** 0.5) / 2
-    result = int((2 / (5 ** 0.5)) * (psi ** (args.number + 1) - (1 - psi) ** (args.number + 1)) - 1)
-    if args.number == 0 or args.number == 1:
-        print(1)
-    else:
-        print(result)
+    try:
+        if args.number == 0 or args.number == 1:
+            print("Ваше число: ", 1)
+        else:
+            print("Ваше число: ", 2 * fib(args.number + 1) - 1)
+    except ValueError:
+        leonardo_by_command_line()
 
 
 if __name__ == "__main__":
