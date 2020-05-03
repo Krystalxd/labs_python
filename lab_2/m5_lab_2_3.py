@@ -1,7 +1,9 @@
 import argparse
+from tempfile import TemporaryFile
+import os
 
 
-def merge_sort(arr):  # main function for line and words merging
+def merge_sort(arr):  # main function for words and lines merging
     if len(arr) > 1:
         mid = len(arr) // 2
         L, R = arr[:mid], arr[mid:]
@@ -30,111 +32,98 @@ def merge_sort(arr):  # main function for line and words merging
             k += 1
 
 
-def sorting_file(file="sorted_file.txt"):
+def sorted_by_words(file):  # getting file sorted by words in line
+    global final_progress
     with open(file, 'r') as f:
-        text = f.readlines()
-        final_word_result = []
-
-        for i in range(len(text)):
-            word_result = []
-            text[i] = text[i].split()
-            word_array = []
-            for k in range(len(text[i])):
-                word_array.append(text[i][k][0])
-            for j in range(len(word_array)):
-                word_array[j] = int(ord(word_array[j]))
-            word_indexed = list(zip(word_array, text[i]))
-            merge_sort(word_indexed)  # merge sorting first letters in words
-            for x in range(len(word_indexed)):
-                word_result.append(list(word_indexed[x]))
-            for x in range(len(word_indexed)):
-                del word_result[x][0]
-            for x in range(len(word_indexed)):
-                word_result[x] = "".join(word_result[x])
-            final_word_result.append(word_result)
-            print("\r", "Прогресс программы: ", round(100 * i / (len(text)), 1), "%", end="")  #
-            # Status bar
-        for x in range(len(final_word_result)):
-            final_word_result[x].append("\n")
-            final_word_result[x] = ", ".join(final_word_result[x])
-
-        line_array, final_line_result = [], []
-
-        for i in range(len(final_word_result)):
-            line_array.append(final_word_result[i][0])
-        for i in range(len(line_array)):
-            line_array[i] = int(ord(line_array[i]))
-
-        line_indexed = list(zip(line_array, final_word_result))
-        merge_sort(line_indexed)  # merge sorting first letters in each line
-
-        for i in range(len(line_indexed)):
-            final_line_result.append(list(line_indexed[i]))
-        for i in range(len(line_indexed)):
-            del final_line_result[i][0]
-        for i in range(len(final_line_result)):
-            final_line_result[i] = "".join(final_line_result[i])  # file sorted by lines and words
-        final_line_result = ",".join(final_line_result)
-        final_line_result = final_line_result.replace(",", '')
-
-    with open(file, 'w') as f:
-        final_line_result = final_line_result[0:-2]
-        f.write(final_line_result)
+        result = ""
+        info = f.readlines()
+        lines_amount = len(info)
+        for i in range(len(info)):
+            info[i] = info[i].split()
+            merge_sort(info[i])
+            info[i] = " ".join(info[i])
+            info[i] += "\n"
+            result += info[i]
+            final_progress += 1
+            print("\r", "Прогресс программы: ", round(50 * i / lines_amount, 1), "%", end="")  # progress bar
+    with open(file, "w") as f:
+        f.write(result)
 
 
-def sorting_file_by_command_line():
-    parser = argparse.ArgumentParser(description="Sorting file")  # Creating of parser to use with command line
-    parser.add_argument("-file", "--file", type=str, default="sorted_file.txt", help="Name of the file")
+def dividing_file_and_sorting_by_lines(file):  # dividing file on temporary smaller files and then
+    # merge sorting them by lines
+    file.seek(0)
+    size = os.path.getsize(file.name)
+
+    if size > 26214400:  # temporary files weight is 25mb
+
+        first_help_file, second_help_file = TemporaryFile(mode="w+t"), TemporaryFile(mode="w+t")
+
+        for line in file:
+            if os.path.getsize(first_help_file.name) <= size // 2:
+                first_help_file.write(line)
+            else:
+                second_help_file.write(line)
+
+        dividing_file_and_sorting_by_lines(first_help_file)
+        dividing_file_and_sorting_by_lines(second_help_file)
+
+        file.seek(0)
+        first_help_file.seek(0)
+        second_help_file.seek(0)
+
+        first_file_line = first_help_file.readline()
+        second_file_line = second_help_file.readline()
+
+        while (first_file_line != "") and (second_file_line != ""):  # merge sort of lines
+            if first_file_line > second_file_line:
+                file.write(second_file_line)
+                second_file_line = second_help_file.readline()  # step of your loop
+            else:
+                file.write(first_file_line)
+                first_file_line = first_help_file.readline()
+        while first_file_line != "":
+            file.write(first_file_line)
+            first_file_line = first_help_file.readline()  # step of your loop
+        while second_file_line != "":
+            file.write(second_file_line)
+            second_file_line = second_help_file.readline()  # step of your loop
+
+    else:  # when our temporary file is less than 25mb finally sorting it by lines
+        global current_progress
+        info = file.readlines()
+        merge_sort(info)
+        file.seek(0)
+        current_progress += len(info)
+        info = "".join(info)
+        file.write(info)
+        print("\r", "Прогресс программы: ", 50 + round((current_progress / final_progress) * 50), "%", end="")
+        # progress bar
+
+
+def final_sorting(file="sorted_file.txt"):  # for saving RAM using external merge sorting instead of basic merge sorting
+    try:
+        sorted_by_words(file)
+        with open(file, "r+") as f:
+            dividing_file_and_sorting_by_lines(f)
+    except ZeroDivisionError:
+        print("Your file is probably empty")
+
+
+def final_sorting_by_args():  # using command line
+    parser = argparse.ArgumentParser(description="External merge sort")  # Creating of parser to use with command line
+    parser.add_argument("-file", "--file", type=str, required=True, help="file needed to be sorted")
     args = parser.parse_args()
-    with open(args.file, 'r') as f:
-        text = f.readlines()
-        final_word_result = []
-
-        for i in range(len(text)):
-            word_result = []
-            text[i] = text[i].split()
-            word_array = []
-            for k in range(len(text[i])):
-                word_array.append(text[i][k][0])
-            for j in range(len(word_array)):
-                word_array[j] = int(ord(word_array[j]))
-            word_indexed = list(zip(word_array, text[i]))
-            merge_sort(word_indexed)  # merge sorting first letters in words
-            for x in range(len(word_indexed)):
-                word_result.append(list(word_indexed[x]))
-            for x in range(len(word_indexed)):
-                del word_result[x][0]
-            for x in range(len(word_indexed)):
-                word_result[x] = "".join(word_result[x])
-            final_word_result.append(word_result)
-            print("\r", "Прогресс программы: ", round(100 * i / (len(text)), 1), "%", end="")  #
-            # Status bar
-        for x in range(len(final_word_result)):
-            final_word_result[x].append("\n")
-            final_word_result[x] = ", ".join(final_word_result[x])
-
-        line_array, final_line_result = [], []
-
-        for i in range(len(final_word_result)):
-            line_array.append(final_word_result[i][0])
-        for i in range(len(line_array)):
-            line_array[i] = int(ord(line_array[i]))
-
-        line_indexed = list(zip(line_array, final_word_result))
-        merge_sort(line_indexed)  # merge sorting first letters in each line
-
-        for i in range(len(line_indexed)):
-            final_line_result.append(list(line_indexed[i]))
-        for i in range(len(line_indexed)):
-            del final_line_result[i][0]
-        for i in range(len(final_line_result)):
-            final_line_result[i] = "".join(final_line_result[i])  # file sorted by lines and words
-        final_line_result = ",".join(final_line_result)
-        final_line_result = final_line_result.replace(",", '')
-    with open(args.file, 'w') as f:
-        final_line_result = final_line_result[0:-2]
-        f.write(final_line_result)
+    file = args.file
+    try:
+        sorted_by_words(file)
+        with open(file, "r+") as f:
+            dividing_file_and_sorting_by_lines(f)
+    except ZeroDivisionError:
+        print("Your file is probably empty")
 
 
 if __name__ == "__main__":
-    sorting_file_by_command_line()
+    current_progress = 0
+    final_progress = 0
+    final_sorting()
